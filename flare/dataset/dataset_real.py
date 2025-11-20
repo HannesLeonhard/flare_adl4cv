@@ -50,7 +50,7 @@ class DatasetLoader(Dataset):
         else:
             self.all_img_path = self.json_dict["frames"]
 
-        self.len_img = len(self.all_img_path)
+        self.len_img = len(self.all_img_path) - 1 # flare dataset does not contain an image 0.png
         test_path = self.base_dir / self.all_img_path[0]["dir"] / Path(self.all_img_path[0]["file_path"] + ".png")
         self.resolution = _load_img(test_path).shape[0:2]
 
@@ -167,7 +167,7 @@ class DatasetLoader(Dataset):
         return img[None, ...], mask[None, ...], semantic[None, ...], flame_expression[None, ...], flame_pose[None, ...], camera, frame_name # Add batch dimension
 
     def __len__(self):
-        return self.len_img
+        return self.len_img -1 # flare dataset does not contain an image 0.png
 
     def __getitem__(self, itr):
         if self.pre_load:
@@ -195,12 +195,11 @@ class DatasetLoader(Dataset):
     def _parse_frame_single(self, idx):
         ''' helper function to parse a single frame and test/debug
         '''
-
+        idx += 1 # flare dataset does not contain an image 0.png
         json_dict = {}
         for frame in self.all_img_path:
             if Path(frame["file_path"]) == Path('./image/' +  f'{idx}'):
                 json_dict = frame.copy()
-        
         assert Path(json_dict["file_path"]) == Path('./image/' +  f'{idx}')
         img_path = self.base_dir / json_dict["dir"] / Path(json_dict["file_path"] + ".png")
         
