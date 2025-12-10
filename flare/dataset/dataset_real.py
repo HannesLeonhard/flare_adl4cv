@@ -181,8 +181,8 @@ class DatasetLoader(Dataset):
             camera = self.all_camera[itr % self.len_img]
             frame_name = self.frames[itr % self.len_img]
         else:
-            img, mask, skin_mask, flame_expression, flame_pose, camera, frame_name = self._parse_frame_single(itr)
-        diff_albedo, diff_normal, diff_roughness, diff_irradiance = self._parse_diffusion_channels(itr)
+            img, mask, skin_mask, flame_expression, flame_pose, camera, frame_name = self._parse_frame_single(itr % self.len_im)
+        diff_albedo, diff_normal, diff_roughness, diff_irradiance = self._parse_diffusion_channels(itr % self.len_im)
         return {
             'img' : img,
             'mask' : mask,

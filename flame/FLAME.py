@@ -23,8 +23,24 @@ from pytorch3d import ops
 from .lbs import *
 from pytorch3d.io import load_obj
 import open3d as o3d
+import os
 
-FLAME_MOUTH_MESH = '/home/hleonhard/adl4cv_ws25-26_Relightable-Avatars/external/flare_adl4cv/assets/canonical_eye_smpl.obj'
+
+# Candidate base directories
+candidates = [
+    "/home/hleonhard/adl4cv_ws25-26_Relightable-Avatars",
+    "/home/jsickert/adl4cv/adl4cv_ws25-26_Relightable-Avatars",
+]
+
+# Pick the first one that exists
+for base in candidates:
+    if os.path.isdir(base):
+        base_dir = base
+        break
+else:
+    raise FileNotFoundError("None of the expected base directories exist.")
+
+FLAME_MOUTH_MESH = f'{base_dir}/external/flare_adl4cv/assets/canonical_eye_smpl.obj'
 
 def to_tensor(array, dtype=torch.float32):
     if 'torch.tensor' not in str(type(array)):
@@ -54,7 +70,6 @@ class FLAME(nn.Module):
 
         self.n_exp = n_exp
         self.dtype = torch.float32
-        FLAME_MOUTH_MESH = '/home/hleonhard/adl4cv_ws25-26_Relightable-Avatars/external/flare_adl4cv/assets/canonical_eye_smpl.obj'
         _, faces, _ = load_obj(FLAME_MOUTH_MESH, load_textures=False)
         self.register_buffer('faces_tensor', to_tensor(to_np(faces.verts_idx, dtype=np.int64), dtype=torch.long))
         self.register_buffer('v_template', to_tensor(to_np(flame_model.v_template) * factor, dtype=self.dtype))   
